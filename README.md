@@ -1,2 +1,4 @@
-# orbex
-Crypto Trading Bot
+# Orbex
+
+**TODO: Add description**
+

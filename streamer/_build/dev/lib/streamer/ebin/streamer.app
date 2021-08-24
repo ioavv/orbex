@@ -1,9 +1,0 @@
-{application,streamer,
-             [{applications,[kernel,stdlib,elixir,logger,websockex,jason]},
-              {description,"streamer"},
-              {modules,['Elixir.Streamer','Elixir.Streamer.Application',
-                        'Elixir.Streamer.Binance',
-                        'Elixir.Streamer.Binance.TradeEvent']},
-              {registered,[]},
-              {vsn,"0.1.0"},
-              {mod,{'Elixir.Streamer.Application',[]}}]}.

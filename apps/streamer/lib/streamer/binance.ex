@@ -6,12 +6,16 @@ defmodule Streamer.Binance do
   @stream_endpoint "wss://stream.binance.com:9443/ws/"
 
   def start_link(symbol) do
-    symbol = String.downcase(symbol)
+    Logger.info(
+      "Binance streamer is connecting to websocket " <>
+        "stream for #{symbol} trade events"
+    )
 
     WebSockex.start_link(
-      "#{@stream_endpoint}#{symbol}@trade",
+      "#{@stream_endpoint}#{String.downcase(symbol)}@trade",
       __MODULE__,
-      nil
+      nil,
+      name: via_tuple(symbol)
     )
   end
 
@@ -25,7 +29,7 @@ defmodule Streamer.Binance do
   end
 
   defp process_event(%{"e" => "trade"} = event) do
-    trade_event = %Streamer.Binance.TradeEvent{
+    trade_event = %Core.Struct.TradeEvent{
       :event_type => event["e"],
       :event_time => event["E"],
       :symbol => event["s"],
@@ -42,7 +46,15 @@ defmodule Streamer.Binance do
       "Trade event received " <>
         "#{trade_event.symbol}@#{trade_event.price}"
     )
+
+    Phoenix.PubSub.broadcast(
+      Core.PubSub,
+      "TRADE_EVENTS:#{trade_event.symbol}",
+      trade_event
+    )
   end
 
-
+  defp via_tuple(symbol) do
+    {:via, Registry, {:binance_streamers, symbol}}
+  end
 end
